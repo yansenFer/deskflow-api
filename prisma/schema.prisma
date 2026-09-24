@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db { 
+  provider = "mysql"
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+}
+
+enum RoomType {
+  MEETING_ROOM
+  HOT_DESK
+  PODCAST_STUDIO
+}
+
+enum BookingStatus {
+  CONFIRMED
+  CHECKED_IN
+  COMPLETED
+  CANCELLED
+  AUTO_RELEASED
+}
+
+model User {
+  id            String          @id @default(cuid())
+  name          String          @db.VarChar(100)
+  email         String          @unique @db.VarChar(191)
+  password      String          @db.VarChar(255)
+  role          Role            @default(MEMBER)
+  creditHours   Float           @default(10.0)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  bookings  Booking[]
+  @@map("users")
+}
+
+model Room {
+  id            String          @id @default(cuid())
+  code          String          @unique @db.VarChar(20)
+  name          String          @db.VarChar(100)
+  type          RoomType        @default(MEETING_ROOM)
+  capacity      Int
+  hourlyRate    Float
+  creditRatePerHour Float       @default(1.0)
+  isActive      Boolean         @default(true)
+  createdAt     DateTime        @default(now())
+
+  bookings Booking[]
+
+  @@map("rooms")
+}
+
+model Booking {
+  id            String          @id @default(cuid())
+  bookingNumber String          @unique @db.VarChar(30)
+  userId        String         
+  roomId        String
+  startTime     DateTime
+  endTime       DateTime
+  totalHours    Float
+  creditsUsed   Float           @default(0)
+  status        BookingStatus   @default(CONFIRMED)
+  checkInToken  String?         @unique @db.VarChar(64)
+  checkedInAt   DateTime?     
+  createdAt     DateTime        @default(now())
+
+  user          User            @relation(fields: [userId], references: [id])
+  room          Room            @relation(fields: [roomId], references: [id])
+
+  @@index([roomId, startTime, endTime])
+  @@index([userId])
+  @@index([status])
+  @@map("bookings")
+}
