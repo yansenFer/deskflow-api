@@ -11,6 +11,7 @@ import { apiReference } from "@scalar/express-api-reference";
 import openApiSpec from "./docs/openapi.json";
 import { errorHandler, notFoundHandler } from "./middlewares/error.middleware";
 import { authRoutes } from "./modules/auth/auth.routes";
+import { userRouters } from "./modules/user/user.routes";
 
 const app: Application = express();
 
@@ -56,6 +57,7 @@ app.use(
 );
 
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/users", userRouters);
 
 // Root route redirect to docs
 app.get("/", (_req: Request, res: Response) => {

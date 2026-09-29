@@ -33,6 +33,10 @@ const envSchema = z.object({
     .string()
     .min(16, "JWT_SECRET must be at least 16 characters long"),
   JWT_EXPIRES_IN: z.string().default("7d"),
+
+  // Meilisearch
+  MEILISEARCH_HOST: z.string().default("http://localhost:7700"),
+  MEILISEARCH_KEY: z.string().default("masterKey123"),
 });
 
 const parseEnv = () => {

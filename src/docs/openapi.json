@@ -91,6 +91,33 @@
           "401": { "description": "Email atau password salah" }
         }
       }
+    },
+    "/api/v1/users": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get All",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 10 }
+          },
+          { "name": "search", "in": "query", "schema": { "type": "string" } },
+          { "name": "email", "in": "query", "schema": { "type": "string" } },
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "List Users" } }
+      }
     }
   }
 }
