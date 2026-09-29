@@ -14,6 +14,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:push": "prisma db push",
     "prisma:seed": "tsx prisma/seed.ts",
+    "prisma:seed:users": "tsx prisma/seed.ts users",
+    "prisma:seed:rooms": "tsx prisma/seed.ts rooms",
     "prisma:studio": "prisma studio"
   },
   "devDependencies": {

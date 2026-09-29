@@ -24,13 +24,135 @@
       "User": {
         "type": "object",
         "properties": {
-          "id": { "type": "string" },
-          "name": { "type": "string" },
-          "email": { "type": "string", "format": "email" },
-          "role": { "type": "string", "enum": ["ADMIN", "CASHIER"] },
-          "creditHours": { "type": "number" },
+          "id": { "type": "string", "example": "cm1usr0000008l0g9hk3xyz" },
+          "name": { "type": "string", "example": "John Doe" },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "user@example.com"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["ADMIN", "MEMBER"],
+            "example": "MEMBER"
+          },
+          "creditHours": { "type": "number", "example": 10.0 },
           "createdAt": { "type": "string", "format": "date-time" },
-          "updateAt": { "type": "string", "format": "date-time" }
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Room": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "example": "cm1abcdef000008l0g9hk3xyz" },
+          "code": { "type": "string", "example": "RM-MAIN-01" },
+          "name": { "type": "string", "example": "Executive Meeting Room" },
+          "type": {
+            "type": "string",
+            "enum": ["MEETING_ROOM", "HOT_DESK", "PODCAST_STUDIO"],
+            "example": "MEETING_ROOM"
+          },
+          "capacity": { "type": "integer", "example": 12 },
+          "hourlyRate": { "type": "number", "example": 150000 },
+          "creditRatePerHour": { "type": "number", "example": 2.0 },
+          "isActive": { "type": "boolean", "example": true },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-09-29T08:00:00.000Z"
+          }
+        }
+      },
+      "CreateRoomRequest": {
+        "type": "object",
+        "required": ["code", "name", "type", "capacity", "hourlyRate"],
+        "properties": {
+          "code": { "type": "string", "example": "RM-MAIN-01" },
+          "name": { "type": "string", "example": "Executive Meeting Room" },
+          "type": {
+            "type": "string",
+            "enum": ["MEETING_ROOM", "HOT_DESK", "PODCAST_STUDIO"],
+            "example": "MEETING_ROOM"
+          },
+          "capacity": { "type": "integer", "example": 12 },
+          "hourlyRate": { "type": "number", "example": 150000 },
+          "creditRatePerHour": {
+            "type": "number",
+            "default": 1.0,
+            "example": 2.0
+          },
+          "isActive": { "type": "boolean", "default": true, "example": true }
+        }
+      },
+      "Booking": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "example": "cm1bkg0000008l0g9hk3xyz" },
+          "bookingNumber": { "type": "string", "example": "BKG-20260929-0001" },
+          "userId": { "type": "string", "example": "cm1usr0000008l0g9hk3xyz" },
+          "roomId": {
+            "type": "string",
+            "example": "cm1abcdef000008l0g9hk3xyz"
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-09-30T09:00:00.000Z"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-09-30T11:00:00.000Z"
+          },
+          "totalHours": { "type": "number", "example": 2.0 },
+          "creditsUsed": { "type": "number", "example": 4.0 },
+          "status": {
+            "type": "string",
+            "enum": [
+              "CONFIRMED",
+              "CHECKED_IN",
+              "COMPLETED",
+              "CANCELLED",
+              "AUTO_RELEASED"
+            ],
+            "example": "CONFIRMED"
+          },
+          "checkInToken": {
+            "type": ["string", "null"],
+            "example": "a8f5f167f44f4964e6c998dee827110c"
+          },
+          "checkedInAt": {
+            "type": ["string", "null"],
+            "format": "date-time",
+            "example": null
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-09-29T08:30:00.000Z"
+          },
+          "user": { "$ref": "#/components/schemas/User" },
+          "room": { "$ref": "#/components/schemas/Room" }
+        }
+      },
+      "CreateBookingRequest": {
+        "type": "object",
+        "required": ["roomId", "startTime", "endTime"],
+        "properties": {
+          "roomId": {
+            "type": "string",
+            "example": "cm1abcdef000008l0g9hk3xyz"
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-09-30T09:00:00.000Z"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-09-30T11:00:00.000Z"
+          }
         }
       }
     }
@@ -117,6 +239,32 @@
           }
         ],
         "responses": { "200": { "description": "List Users" } }
+      }
+    },
+    "/api/v1/rooms": {
+      "get": {
+        "tags": ["Rooms"],
+        "summary": "Get All",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 10 }
+          },
+          { "name": "search", "in": "query", "schema": { "type": "string" } },
+          {
+            "name": "roomId",
+            "in": "query",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "List Rooms" } }
       }
     }
   }
