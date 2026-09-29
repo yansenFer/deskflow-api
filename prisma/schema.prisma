@@ -41,6 +41,7 @@ model User {
   updatedAt     DateTime        @updatedAt
 
   bookings  Booking[]
+  @@index([createdAt])
   @@map("users")
 }
 

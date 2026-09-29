@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { prisma } from "../../config/prisma";
 import { env } from "../../config/env";
 import { AppError } from "../../utils/app-error";
+import { invalidateCountCache } from "../../utils/db-cache";
 import type { RegisterInput, LoginInput } from "./auth.schema";
 
 export class AuthService {
@@ -32,6 +33,8 @@ export class AuthService {
         createdAt: true,
       },
     });
+
+    invalidateCountCache("user");
 
     return user;
   }

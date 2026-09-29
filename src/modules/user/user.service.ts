@@ -1,7 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import type { UserQuerySchema } from "./user.schema";
 import { prisma } from "../../config/prisma";
-import { use } from "react";
+import { getCachedCount } from "../../utils/db-cache";
 
 export class UserService {
   static async getAll(query: Partial<UserQuerySchema>) {
@@ -35,7 +35,11 @@ export class UserService {
         take: limit,
         orderBy: { createdAt: "desc" },
       }),
-      prisma.user.count({ where }),
+      getCachedCount({
+        modelName: "user",
+        model: prisma.user,
+        where,
+      }),
     ]);
 
     const totalPages = Math.ceil(total / limit);
@@ -51,3 +55,5 @@ export class UserService {
     };
   }
 }
+
+
